@@ -91,6 +91,8 @@ Pada pelatihan, model mengalami konvergensi dengan penurunan nilai loss yang sig
 
 ### 📉 Loss Curve
 Model autoencoder dilatih selama 50 epoch dengan data grayscale sebagai input dan RGB sebagai target. Fungsi loss yang digunakan adalah Mean Squared Error (MSE).
+
+
 ![Loss](grafikLoss.png)
 
 
