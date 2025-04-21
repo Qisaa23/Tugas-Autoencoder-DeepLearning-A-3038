@@ -8,22 +8,31 @@ Repositori ini merupakan implementasi dari model **autoencoder** untuk menyelesa
 
 ## 📁 Dataset
 
-Dataset yang digunakan adalah dataset **landscape** berisi gambar pemandangan berwarna dan versi grayscale-nya. Dataset disusun sebagai berikut:
-
+Dataset yang digunakan adalah: **Landscape color and grayscale images** dari Kaggle yang berisi gambar pemandangan berwarna dan versi grayscale-nya. Dataset disusun sebagai berikut:
 
 - Jumlah data: 200 pasang gambar
 - Format: `.jpg`
 - Resolusi citra diubah ke `(128, 128)` piksel
-  
-Contoh pasangan input dan ouput citra:
 
-| Grayscale (`gray.jpg`) | Warna Asli (`color.jpg`) |
-|--------------------------|-----------------------------|
-| ![gray](dataset/gray/0.jpg) | ![color](dataset/color/0.jpg) |
-| ![gray](dataset/gray/1.jpg) | ![color](dataset/color/1.jpg) |
-| ![gray](dataset/gray/2.jpg) | ![color](dataset/color/2.jpg) |
-| ![gray](dataset/gray/3.jpg) | ![color](dataset/color/3.jpg) |
-| ![gray](dataset/gray/4.jpg) | ![color](dataset/color/4.jpg) |
+Struktur folder:
+```
+dataset/
+├── color/    # berisi citra RGB (target)
+├── gray/     # berisi citra grayscale (input, hanya digunakan untuk referensi visual)
+```
+  
+## 🖼️ Contoh Hasil
+Berikut adalah hasil colorization oleh model autoencoder:
+
+| Input (Grayscale) | Predicted (Colorized) | Target (Asli Berwarna) |
+|-------------------|------------------------|--------------------------|
+| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_0.png) | ![color](dataset/color/0.jpg) |
+| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_1.png) | ![color](dataset/color/0.jpg) |
+| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_2.png) | ![color](dataset/color/0.jpg) |
+| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_3.png) | ![color](dataset/color/0.jpg) |
+| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_4.png) | ![color](dataset/color/0.jpg) |
+
+> Catatan: hasil citra berwarna yang diprediksi disimpan secara otomatis ke dalam folder `output/predicted/`
 
 - **Input (Gray)**: Citra grayscale (hitam-putih) yang diberikan ke model.
 - **Predicted Output**: Citra berwarna yang dihasilkan oleh model berdasarkan citra grayscale.
@@ -33,6 +42,10 @@ Contoh pasangan input dan ouput citra:
 ## 🧠 Arsitektur Autoencoder
 
 Model autoencoder yang digunakan terdiri dari dua bagian utama:
+- **Encoder**: 3 lapis Conv2D + MaxPooling2D
+- **Decoder**: 3 lapis Conv2D + UpSampling2D
+- Output layer: Conv2D dengan 2 filter (untuk kanal a dan b LAB)
+
 
 ### 🔻 Encoder
 Encoder berfungsi untuk mengompresi gambar grayscale menjadi representasi yang lebih kecil (low-dimensional) menggunakan layer konvolusi:
@@ -63,10 +76,10 @@ Model ini dioptimalkan menggunakan **Adam Optimizer** dan menggunakan **Mean Squ
 
 ## ⚙️ Training dan Evaluasi
 
-- **Loss Function**: Mean Squared Error (MSE)
-- **Optimizer**: Adam
-- **Epochs**: 50
-- **Batch Size**: 16
+- Epochs: **50**
+- Batch size: **8**
+- Loss: **Mean Squared Error (MSE)**
+- Optimizer: **Adam (lr = 1e-4)**
 
 Selama pelatihan, model berhasil menurunkan nilai loss secara bertahap.
 
@@ -75,6 +88,9 @@ Model autoencoder dilatih selama **10 epoch** dengan batch size **8** dan split 
 
 ### Performa Model (Loss)
 Pada pelatihan, model mengalami konvergensi dengan penurunan nilai loss yang signifikan. Nilai loss ini diukur menggunakan **Mean Squared Error (MSE)**, yang mengukur perbedaan antara citra output yang dihasilkan oleh model dengan citra target yang sebenarnya.
+
+### 📉 Loss Curve
+![Loss](grafikLoss.png)
 
 Nilai loss yang dihasilkan model selama pelatihan mengalami penurunan yang stabil, menunjukkan bahwa model belajar dengan baik untuk menghasilkan gambar berwarna yang mendekati gambar target.
 - Penurunan Loss yang Konsisten:
