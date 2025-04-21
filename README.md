@@ -91,11 +91,13 @@ Pada pelatihan, model mengalami konvergensi dengan penurunan nilai loss yang sig
 
 ### 📉 Loss Curve
 ![Loss](grafikLoss.png)
+Model autoencoder dilatih selama 50 epoch dengan data grayscale sebagai input dan RGB sebagai target. Fungsi loss yang digunakan adalah Mean Squared Error (MSE).
 
-Nilai loss yang dihasilkan model selama pelatihan mengalami penurunan yang stabil, menunjukkan bahwa model belajar dengan baik untuk menghasilkan gambar berwarna yang mendekati gambar target.
-- Penurunan Loss yang Konsisten:
-Selama 10 epoch, model menunjukkan penurunan training loss dari 0.0625 ke 0.0105 dan validation loss dari 0.0220 ke 0.0085. Penurunan ini menunjukkan bahwa model berhasil belajar secara efektif untuk menghasilkan gambar yang lebih mendekati target.
-- Rata-rata Loss:
-Rata-rata training loss selama 10 epoch adalah 0.0152, sedangkan rata-rata validation loss adalah 0.0111. Nilai ini menunjukkan performa yang cukup baik, dengan model mampu mengeneralisasi pada data validasi tanpa mengalami overfitting.
+📊 Ringkasan Performa:
+Loss awal: 0.0028
+Val_loss awal: 0.0058
+Loss akhir: 0.0021
+Val_loss akhir: 0.0051
+Val_loss terbaik: 0.0049 (pada epoch 41)
 
-Dengan rata-rata loss yang relatif rendah, model sudah cukup berhasil melakukan pewarnaan gambar, meskipun ada ruang untuk perbaikan lebih lanjut.
+Model menunjukkan konvergensi yang stabil, meskipun masih terdapat sedikit fluktuasi pada nilai validation loss. Hal ini menunjukkan bahwa model mampu mempelajari representasi fitur dari citra grayscale untuk merekonstruksi warna meskipun dengan keterbatasan data dan kompleksitas.
