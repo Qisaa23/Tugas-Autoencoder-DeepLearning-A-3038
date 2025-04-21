@@ -94,11 +94,15 @@ Model autoencoder dilatih selama 50 epoch dengan data grayscale sebagai input da
 ![Loss](grafikLoss.png)
 
 
-📊 Ringkasan Performa:
+### 📊 Ringkasan Performa:
 Loss awal: 0.0028
+
 Val_loss awal: 0.0058
+
 Loss akhir: 0.0021
+
 Val_loss akhir: 0.0051
+
 Val_loss terbaik: 0.0049 (pada epoch 41)
 
 Model menunjukkan konvergensi yang stabil, meskipun masih terdapat sedikit fluktuasi pada nilai validation loss. Hal ini menunjukkan bahwa model mampu mempelajari representasi fitur dari citra grayscale untuk merekonstruksi warna meskipun dengan keterbatasan data dan kompleksitas.
