@@ -83,9 +83,6 @@ Model ini dioptimalkan menggunakan **Adam Optimizer** dan menggunakan **Mean Squ
 
 Selama pelatihan, model berhasil menurunkan nilai loss secara bertahap.
 
-### Proses Pelatihan
-Model autoencoder dilatih selama **10 epoch** dengan batch size **8** dan split data validasi sebesar 10%. Data yang digunakan untuk pelatihan adalah gambar grayscale sebagai input dan gambar berwarna sebagai target output.
-
 ### Performa Model (Loss)
 Pada pelatihan, model mengalami konvergensi dengan penurunan nilai loss yang signifikan. Nilai loss ini diukur menggunakan **Mean Squared Error (MSE)**, yang mengukur perbedaan antara citra output yang dihasilkan oleh model dengan citra target yang sebenarnya.
 
