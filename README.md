@@ -90,8 +90,9 @@ Model autoencoder dilatih selama **10 epoch** dengan batch size **8** dan split 
 Pada pelatihan, model mengalami konvergensi dengan penurunan nilai loss yang signifikan. Nilai loss ini diukur menggunakan **Mean Squared Error (MSE)**, yang mengukur perbedaan antara citra output yang dihasilkan oleh model dengan citra target yang sebenarnya.
 
 ### 📉 Loss Curve
-![Loss](grafikLoss.png)
 Model autoencoder dilatih selama 50 epoch dengan data grayscale sebagai input dan RGB sebagai target. Fungsi loss yang digunakan adalah Mean Squared Error (MSE).
+![Loss](grafikLoss.png)
+
 
 📊 Ringkasan Performa:
 Loss awal: 0.0028
