@@ -26,11 +26,11 @@ Berikut adalah hasil colorization oleh model autoencoder:
 
 | Input (Grayscale) | Predicted (Colorized) | Target (Asli Berwarna) |
 |-------------------|------------------------|--------------------------|
-| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_0.png) | ![color](dataset/color/0.jpg) |
-| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_1.png) | ![color](dataset/color/0.jpg) |
-| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_2.png) | ![color](dataset/color/0.jpg) |
-| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_3.png) | ![color](dataset/color/0.jpg) |
-| ![gray](dataset/gray/0.jpg) | ![predicted](predicted_4.png) | ![color](dataset/color/0.jpg) |
+| ![gray](dataset/gray/21.jpg) | ![predicted](predicted/predicted_5.png) | ![color](dataset/color/21.jpg) |
+| ![gray](dataset/gray/60.jpg) | ![predicted](predicted/predicted_3.png) | ![color](dataset/color/60.jpg) |
+| ![gray](dataset/gray/71.jpg) | ![predicted](predicted/predicted_7.png) | ![color](dataset/color/71.jpg) |
+| ![gray](dataset/gray/111.jpg) | ![predicted](predicted/predicted_1.png) | ![color](dataset/color/111.jpg) |
+| ![gray](dataset/gray/125.jpg) | ![predicted](predicted/predicted_2.png) | ![color](dataset/color/125.jpg) |
 
 > Catatan: hasil citra berwarna yang diprediksi disimpan secara otomatis ke dalam folder `output/predicted/`
 
