@@ -1,89 +1,129 @@
+# === IMPORT LIBRARY ===
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+import cv2
+
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D
 from tensorflow.keras.optimizers import Adam
+from sklearn.model_selection import train_test_split
+from skimage.color import rgb2lab, lab2rgb
 
-# Path ke folder dataset
-gray_folder = "dataset/gray"
+# === KONFIGURASI DATASET ===
 color_folder = "dataset/color"
+output_folder = "output/predicted"
+os.makedirs(output_folder, exist_ok=True)
 
-# Fungsi load dan resize gambar
-def load_images_from_folder(folder, size=(256, 256), grayscale=False, max_images=100):
-    images = []
+# Fungsi load dan konversi RGB -> LAB
+
+def load_images_rgb_lab(folder, size=(256, 256), max_images=200):
+    images_l = []
+    images_ab = []
     for i, filename in enumerate(sorted(os.listdir(folder))):
         if i >= max_images:
             break
         path = os.path.join(folder, filename)
-        with Image.open(path) as img:
-            img = img.convert('L') if grayscale else img.convert('RGB')
-            img = img.resize(size)
-            img_array = np.asarray(img) / 255.0
-            images.append(img_array)
-    return np.array(images)
+        img = Image.open(path).convert('RGB').resize(size)
+        img_np = np.asarray(img) / 255.0
+        img_lab = rgb2lab(img_np).astype("float32")
 
-# Load data
-x_gray = load_images_from_folder(gray_folder, grayscale=True, max_images=200)
-x_color = load_images_from_folder(color_folder, grayscale=False, max_images=200)
+        L = img_lab[:, :, 0] / 100.0               # Normalisasi L
+        ab = (img_lab[:, :, 1:] + 128) / 255.0     # Normalisasi a,b
 
+        images_l.append(L.reshape(size[0], size[1], 1))
+        images_ab.append(ab)
 
-# Ubah grayscale ke shape: (n, 256, 256, 1)
-x_gray = np.expand_dims(x_gray, axis=-1)
+    return np.array(images_l), np.array(images_ab)
 
-print(f"Grayscale shape: {x_gray.shape}, RGB shape: {x_color.shape}")
+# Load dataset
+x_l, y_ab = load_images_rgb_lab(color_folder)
 
-# === Model Autoencoder ===
-input_img = Input(shape=(256, 256, 1))
+print("L shape:", x_l.shape, "AB shape:", y_ab.shape)
 
-# Encoder
-x = Conv2D(64, (3, 3), activation='relu', padding='same')(input_img)
+# Split data
+x_train, x_val, y_train, y_val = train_test_split(x_l, y_ab, test_size=0.1, random_state=42)
+
+# === DEFINISI MODEL AUTOENCODER ===
+input_layer = Input(shape=(256, 256, 1))
+
+# Encoder (deeper)
+x = Conv2D(64, (3, 3), activation='relu', padding='same')(input_layer)
 x = MaxPooling2D((2, 2), padding='same')(x)
 x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
 x = MaxPooling2D((2, 2), padding='same')(x)
+x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
+x = MaxPooling2D((2, 2), padding='same')(x)
 
 # Decoder
+x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
+x = UpSampling2D((2, 2))(x)
 x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
 x = UpSampling2D((2, 2))(x)
 x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
 x = UpSampling2D((2, 2))(x)
-decoded = Conv2D(3, (3, 3), activation='sigmoid', padding='same')(x)
 
-autoencoder = Model(input_img, decoded)
-autoencoder.compile(optimizer=Adam(), loss='mse')
-autoencoder.summary()
+output_layer = Conv2D(2, (3, 3), activation='sigmoid', padding='same')(x)
 
-# Training
-autoencoder.fit(x_gray, x_color,
-                epochs=10,
-                batch_size=8,
-                shuffle=True,
-                validation_split=0.1)
+model = Model(input_layer, output_layer)
+model.compile(optimizer=Adam(1e-4), loss='mse')
+model.summary()
 
-# === Visualisasi Hasil ===
-decoded_imgs = autoencoder.predict(x_gray[:10])
+# === TRAINING ===
+history = model.fit(x_train, y_train,
+                    validation_data=(x_val, y_val),
+                    epochs=50,
+                    batch_size=8,
+                    shuffle=True)
 
-n = 10
+# === VISUALISASI HASIL ===
+preds_ab = model.predict(x_val[:10])
+
 plt.figure(figsize=(20, 6))
-for i in range(n):
-    # Input grayscale
-    ax = plt.subplot(3, n, i + 1)
-    plt.imshow(x_gray[i].reshape(256, 256), cmap='gray')
-    plt.title("Input (gray)")
-    plt.axis("off")
+for i in range(10):
+    L = x_val[i].reshape(256, 256, 1) * 100  # Kembali ke skala 0-100
+    ab = preds_ab[i] * 255 - 128             # Kembali ke skala -128 hingga 127
+    lab_image = np.concatenate((L, ab), axis=-1)
+    rgb_image = lab2rgb(lab_image)
 
-    # Prediksi autoencoder
-    ax = plt.subplot(3, n, i + 1 + n)
-    plt.imshow(decoded_imgs[i])
-    plt.title("Output (predicted)")
-    plt.axis("off")
+    # Simpan gambar hasil prediksi
+    save_path = os.path.join(output_folder, f"predicted_{i}.png")
+    rgb_uint8 = (rgb_image * 255).astype(np.uint8)
+    Image.fromarray(rgb_uint8).save(save_path)
 
-    # Target asli (RGB)
-    ax = plt.subplot(3, n, i + 1 + 2*n)
-    plt.imshow(x_color[i])
-    plt.title("Target (color)")
+    # Input
+    ax = plt.subplot(3, 10, i + 1)
+    plt.imshow(x_val[i].reshape(256, 256), cmap='gray')
     plt.axis("off")
+    plt.title("Input")
 
+    # Prediksi
+    ax = plt.subplot(3, 10, i + 1 + 10)
+    plt.imshow(rgb_image)
+    plt.axis("off")
+    plt.title("Predicted")
+
+    # Target
+    ab_true = y_val[i] * 255 - 128
+    lab_true = np.concatenate((L, ab_true), axis=-1)
+    rgb_true = lab2rgb(lab_true)
+    ax = plt.subplot(3, 10, i + 1 + 20)
+    plt.imshow(rgb_true)
+    plt.axis("off")
+    plt.title("Target")
+
+plt.tight_layout()
+plt.show()
+
+# === VISUALISASI LOSS ===
+plt.figure(figsize=(8, 4))
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Training vs Validation Loss')
+plt.legend()
+plt.grid()
 plt.tight_layout()
 plt.show()
